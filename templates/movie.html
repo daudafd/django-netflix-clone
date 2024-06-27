@@ -1,0 +1,84 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Clone</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/style.css' %}" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+   
+</head>
+
+<body class="text-white" style="background-color: #141414;">
+    <header class="p-5 flex justify-between items-centpasser">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Logonetflix.png" height="30" alt="Netflix Logo" width="110">
+        
+        
+        <nav class="flex space-x-5">
+            <span><a href="/">Home</a></span>
+            
+            <div class="dropdown">
+                <span id="dropdownMenuButton" class="cursor-pointer">Genres ▼</span>
+                
+                <div id="dropdownMenu" class="dropdown-content hidden">
+                    <ul><a href="/genre/action/">Action</a></ul>
+                    <ul><a href="/genre/comedy/">Comedy</a></ul>
+                    <ul><a href="/genre/drama/">Drama</a></ul>
+                    <ul><a href="/genre/horror/">Horror</a></ul>
+                    <ul><a href="/genre/romance/">Romance</a></ul>
+                    <ul><a href="/genre/sciencefiction/">Science Fiction</a></ul>
+                    <ul><a href="/genre/fantasy/">Fantasy</a></ul>
+                </div>
+            </div>
+
+            <span><a href="/my-favourite">My Favourite</a></span>
+        </nav>
+
+
+        <div class="flex space-x-5 items-center">
+            <form action="search/" method="POST">
+                {% csrf_token %}
+                <input type="search" name="search_term" placeholder="Search" class="bg-gray-700 p-2 rounded">
+                <button class="bg-red-600 text-white p-2 rounded hover:bg-red-500">Search</button>
+            </form>
+            <a href="#" class="block p-2">Welcome, {{user.username}}</a>
+            <div class="relative">
+                <!-- <a href="#" class="block p-2">Welcome, {{user.username}}</a>  -->
+                <a href="/logout" class="block p-2">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <hr>
+    <!-- Main Content -->
+    <div class="container mx-auto mt-10">
+        <!-- Movie Title and Back Button -->
+        <div class="flex items-center justify-between">
+            <h2 class="text-3xl font-semibold">{{movie_details.title}}</h2>
+            <a href="/" class="text-gray-400 hover:text-white">← Back to movies</a>
+        </div>
+
+        <div class="mt-8">
+            <video class="w-full h-auto" controls>
+                <source src="{{movie_details.video.url}}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+
+
+        <!-- Movie Description -->
+        <div class="mt-6">
+            <h3 class="text-xl font-semibold mb-2">About the Movie</h3>
+            <p>
+                {{movie_details.description}}
+            </p>
+        </div>
+    </div>
+
+</body>
+
+</html>
