@@ -108,26 +108,6 @@ def add_to_favourite(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 
-def login_view(request):
-    if request.method == 'POST':
-        username = request.POST['input_username']
-        password = request.POST['input_password']
-
-        user = auth.authenticate(username=username, password=password)
-
-        if user is not None:
-            auth.login(request, user)
-            return redirect('/')
-        else:
-            # messages.info(request, 'Invalid Login Credentials')
-            # return redirect('/')
-            messages.info(request, 'Invalid Login Credentials')
-            context = {'messages': messages.get_messages(request)}  # Get messages
-            return render(request, 'login.html', context)  # Render login with context
-    else:
-        return render(request, 'login.html')
-    
-
 def signup_view(request):
     if request.method == 'POST':
         email = request.POST['input_email']
@@ -137,25 +117,66 @@ def signup_view(request):
 
         if password == password2:
             if User.objects.filter(email=email).exists():
-                messages.info(request, 'Email Taken')
-                return redirect('signup')
+                error_message = 'Email Taken'
+                if request.is_ajax():
+                    return JsonResponse({'success': False, 'error_message': error_message})
+                else:
+                    messages.info(request, error_message)
+                    return redirect('login')
             elif User.objects.filter(username=username).exists():
-                messages.info(request, 'Username Taken')
-                return redirect('signup')
+                error_message = 'Username Taken'
+                if request.is_ajax():
+                    return JsonResponse({'success': False, 'error_message': error_message})
+                else:
+                    messages.info(request, error_message)
+                    return redirect('login')
             else:
                 user = User.objects.create_user(username=username, email=email, password=password)
                 user.save()
 
-                #Log in user
+                # Log in user
                 user_login = auth.authenticate(username=username, password=password)
                 auth.login(request, user_login)
+                if request.is_ajax():
+                    return JsonResponse({'success': True})
+                else:
+                    return redirect('/')
+        else:
+            error_message = 'Passwords Do Not Match'
+            if request.is_ajax():
+                return JsonResponse({'success': False, 'error_message': error_message})
+            else:
+                messages.info(request, error_message)
+                return redirect('login')
+    else:
+        return render(request, 'login.html')
+
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['input_username']
+        password = request.POST['input_password']
+
+        user = auth.authenticate(username=username, password=password)
+        
+        if user is not None:
+            auth.login(request, user)
+            if request.is_ajax():
+                return JsonResponse({'success': True})
+            else:
                 return redirect('/')
         else:
-            messages.info(request, 'Password Do Not Match')
-            return redirect('signup')
+            error_message = 'Invalid credentials'
+            if request.is_ajax():
+                return JsonResponse({'success': False, 'error_message': error_message})
+            else:
+                messages.info(request, error_message)
+                return redirect('login')
     else:
-        return render(request, 'signup.html')
+        return render(request, 'login.html')
     
+
+
 @login_required(login_url='login')
 def logout(request):
     auth.logout(request)

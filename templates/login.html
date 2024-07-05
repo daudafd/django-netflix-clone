@@ -52,60 +52,45 @@
         </div>
     </section>
 
-    <!-- SignIn Modal container hidden by default -->
-    <div id="signinModal" class="signinmodal">
-        <div class="signin-container">
-            <h1>Login</h1>
-
-            <div>
-                <style>
-                    h5 {
-                        color: red;
-                    }
-                </style>
-                {% for message in messages %}
-                <h5>{{message}}</h5>
-                {% endfor %}
-            </div>
-
-            <form action="" method="POST">
-                {% csrf_token %}
-                <input type="text" name="input_username" placeholder="Username" />
-                <input type="password" name="input_password" placeholder="Password" />
-                <button type="submit" class="signin-btn">Login</button>
-            </form>
-            <div class="help-text" align="center">
-                <h2>Unlimited movies, TV shows, and more.</h2>
-            </div>
+<!-- SignIn Modal -->
+<div id="signinModal" class="signinmodal">
+    <div class="signin-container">
+        <h1>Login</h1>
+        <div id="loginError">
+            {% for message in messages %}
+            <h1>{{message}}</h1>
+            {% endfor %}
+        </div>
+        <form id="loginForm" action="{% url 'login' %}" method="POST">
+            {% csrf_token %}
+            <input type="text" name="input_username" placeholder="Username" />
+            <input type="password" name="input_password" placeholder="Password" />
+            <button type="submit" class="signin-btn">Login</button>
+        </form>
+        <div class="help-text" align="center">
+            <h2>Unlimited movies, TV shows, and more.</h2>
         </div>
     </div>
-
+</div>
 
     <div id="signupModal" class="signupmodal">
         <div class="signup-container">
             <h1>Sign Up</h1>
-            <!-- <h2>Unlimited movies, TV shows, and more.</h2> -->
-
-            <div>
-                <style>
-                    h5 {
-                        color: red;
-                    }
-                </style>
+            <div id="signupError">
                 {% for message in messages %}
-                <h5>{{message}}</h5>
+                <h1>{{message}}</h1>
                 {% endfor %}
             </div>
 
-            <form action="" method="POST">
+            <form id="signupForm" action="{% url 'signup' %}" method="POST">
                 {% csrf_token %}
-                <input type="email" name="input_email" placeholder="Email address" />
-                <input type="text" name="input_username" placeholder="Username" />
-                <input type="password" name="input_password" placeholder="Password" />
-                <input type="password" name="input_password2" placeholder="Repeat Password" />
-                <button style="color:white" type="submit" class="signup-btn">Get Started ></button>
+                <input type="email" name="input_email" placeholder="Email address" required />
+                <input type="text" name="input_username" placeholder="Username" required />
+                <input type="password" name="input_password" placeholder="Password" required />
+                <input type="password" name="input_password2" placeholder="Repeat Password" required />
+                <button type="submit" class="signup-btn">Get Started ></button>
             </form>
-            </form>
+
             <div class="help-text" align="center">
                 <h2>Unlimited movies, TV shows, and more.</h2>
             </div>
@@ -250,98 +235,106 @@
         </div>
     </footer>
 
+
     <script>
-        // JavaScript to show and hide the modal
-        document.addEventListener("DOMContentLoaded", function () {
-            const signInButton = document.querySelector('.sign__in__btn');
-            const modal = document.getElementById('signinModal');
+    document.addEventListener("DOMContentLoaded", function () {
+    const signInButton = document.querySelector('.sign__in__btn');
+    const signUpButton = document.querySelector('.sign__up__btn');
+    const signinModal = document.getElementById('signinModal');
+    const signupModal = document.getElementById('signupModal');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const loginError = document.getElementById('loginError');
+    const signupError = document.getElementById('signupError');
 
-            signInButton.addEventListener('click', (event) => {
-                event.preventDefault(); // Prevent default anchor behavior
-                modal.style.display = 'block';
-            });
+    signInButton.addEventListener('click', (event) => {
+        event.preventDefault(); // Prevent default anchor behavior
+        signinModal.style.display = 'block';
+    });
 
-            // Close the modal when anywhere outside it is clicked
-            window.addEventListener('click', (event) => {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
+    signUpButton.addEventListener('click', (event) => {
+        event.preventDefault(); // Prevent default anchor behavior
+        signupModal.style.display = 'block';
+    });
 
-            // Close the modal when the escape key is pressed
-            window.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape' && modal.style.display === 'block') {
-                    modal.style.display = 'none';
-                }
-            });
+    // Close the modal when anywhere outside it is clicked
+    window.addEventListener('click', (event) => {
+        if (event.target === signinModal) {
+            signinModal.style.display = 'none';
+        }
+        if (event.target === signupModal) {
+            signupModal.style.display = 'none';
+        }
+    });
 
-            // JavaScript to handle form submission without closing modal
-            const loginForm = document.querySelector('.signin-container form');
+    // Close the modal when the escape key is pressed
+    window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && signinModal.style.display === 'block') {
+            signinModal.style.display = 'none';
+        }
+        if (event.key === 'Escape' && signupModal.style.display === 'block') {
+            signupModal.style.display = 'none';
+        }
+    });
 
-            loginForm.addEventListener('submit', async (event) => {
-                event.preventDefault(); // Prevent default form submission
+    // Handle login form submission
+    loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault(); // Prevent default form submission
 
-                const formData = new FormData(loginForm);
-                const response = await fetch(loginForm.action, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    // Handle successful login (redirect as before)
-                    window.location.href = '/';
-                } else {
-                    // Handle error:
-                    // 1. Show the modal (ensure it's displayed)
-                    modal.style.display = 'block';
-
-                    // 2. Retrieve error message(s) from the response (if available)
-                    const errorData = await response.json(); // Parse JSON response (if applicable)
-                    let errorMessage = 'An error occurred.';  // Default message
-
-                    if (errorData && errorData.error_message) {
-                        errorMessage = errorData.error_message;
-                    } else if (messages) {  // Check for Django messages (if sent)
-                        const djangoMessages = messages.getMessages(document.body);  // Get messages
-                        if (djangoMessages.length > 0) {
-                            errorMessage = djangoMessages[0].message;  // Use first message
-                        }
-                    }
-
-                    // 3. Display the error message in the modal
-                    const errorElement = document.querySelector('.signin-container h5'); // Adjust selector as needed
-                    errorElement.textContent = errorMessage;  // Update error text
-                }
-            });
-
+        const formData = new FormData(loginForm);
+        const response = await fetch(loginForm.action, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest', // Indicate AJAX request
+            },
+            body: formData
         });
 
-
-
-
-
-
-        // JavaScript to show and hide the Sign up modal
-        const signUpButton = document.querySelector('.sign__up__btn');
-        const signupmodal = document.getElementById('signupModal');
-
-        signUpButton.addEventListener('click', () => {
-            signupmodal.style.display = 'block';
-        });
-
-        // Close the modal when anywhere outside it is clicked
-        window.addEventListener('click', (event) => {
-            if (event.target === signupmodal) {
-                signupmodal.style.display = 'none';
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                // Redirect on successful login
+                window.location.href = '/';
+            } else {
+                // Display error message in the modal
+                loginError.textContent = data.error_message;
+                signinModal.style.display = 'block'; // Ensure modal stays open
             }
+        } else {
+            loginError.textContent = 'An error occurred. Please try again.';
+            signinModal.style.display = 'block'; // Ensure modal stays open
+        }
+    });
+
+    // Handle signup form submission
+    signupForm.addEventListener('submit', async (event) => {
+        event.preventDefault(); // Prevent default form submission
+
+        const formData = new FormData(signupForm);
+        const response = await fetch(signupForm.action, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest', // Indicate AJAX request
+            },
+            body: formData
         });
 
-        // Close the modal when the escape key is pressed
-        window.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape' && signupmodal.style.display === 'block') {
-                signupmodal.style.display = 'none';
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                // Redirect on successful signup
+                window.location.href = '/';
+            } else {
+                // Display error message in the modal
+                signupError.textContent = data.error_message;
+                signupModal.style.display = 'block'; // Ensure modal stays open
             }
-        });
+        } else {
+            signupError.textContent = 'An error occurred. Please try again.';
+            signupModal.style.display = 'block'; // Ensure modal stays open
+        }
+    });
+});
     </script>
 </body>
 

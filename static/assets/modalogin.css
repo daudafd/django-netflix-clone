@@ -651,3 +651,18 @@ button {
 .signup-container .help-text a:hover {
     text-decoration: underline;
 }
+
+
+#loginError {
+  font-size: 1.8rem; /* Increase font size */
+  text-align: center; /* Center the text */
+  color: red; /* Optional: Set a distinct color */
+  margin-bottom: 1rem; /* Add some spacing below the message */
+}
+
+#signupError {
+  font-size: 1.8rem; /* Increase font size */
+  text-align: center; /* Center the text */
+  color: red; /* Optional: Set a distinct color */
+  margin-bottom: 1rem; /* Add some spacing below the message */
+}
