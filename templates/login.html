@@ -237,105 +237,98 @@
 
 
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
-    const signInButton = document.querySelector('.sign__in__btn');
-    const signUpButton = document.querySelector('.sign__up__btn');
-    const signinModal = document.getElementById('signinModal');
-    const signupModal = document.getElementById('signupModal');
-    const loginForm = document.getElementById('loginForm');
-    const signupForm = document.getElementById('signupForm');
-    const loginError = document.getElementById('loginError');
-    const signupError = document.getElementById('signupError');
-
-    signInButton.addEventListener('click', (event) => {
-        event.preventDefault(); // Prevent default anchor behavior
-        signinModal.style.display = 'block';
-    });
-
-    signUpButton.addEventListener('click', (event) => {
-        event.preventDefault(); // Prevent default anchor behavior
-        signupModal.style.display = 'block';
-    });
-
-    // Close the modal when anywhere outside it is clicked
-    window.addEventListener('click', (event) => {
-        if (event.target === signinModal) {
-            signinModal.style.display = 'none';
-        }
-        if (event.target === signupModal) {
-            signupModal.style.display = 'none';
-        }
-    });
-
-    // Close the modal when the escape key is pressed
-    window.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && signinModal.style.display === 'block') {
-            signinModal.style.display = 'none';
-        }
-        if (event.key === 'Escape' && signupModal.style.display === 'block') {
-            signupModal.style.display = 'none';
-        }
-    });
-
-    // Handle login form submission
-    loginForm.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Prevent default form submission
-
-        const formData = new FormData(loginForm);
-        const response = await fetch(loginForm.action, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest', // Indicate AJAX request
-            },
-            body: formData
+        document.addEventListener("DOMContentLoaded", function () {
+            const signInButton = document.querySelector('.sign__in__btn');
+            const signUpButton = document.querySelector('.sign__up__btn');
+            const signinModal = document.getElementById('signinModal');
+            const signupModal = document.getElementById('signupModal');
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const loginError = document.getElementById('loginError');
+            const signupError = document.getElementById('signupError');
+    
+            signInButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                signinModal.style.display = 'block';
+            });
+    
+            signUpButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                signupModal.style.display = 'block';
+            });
+    
+            window.addEventListener('click', (event) => {
+                if (event.target === signinModal) {
+                    signinModal.style.display = 'none';
+                }
+                if (event.target === signupModal) {
+                    signupModal.style.display = 'none';
+                }
+            });
+    
+            window.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && signinModal.style.display === 'block') {
+                    signinModal.style.display = 'none';
+                }
+                if (event.key === 'Escape' && signupModal.style.display === 'block') {
+                    signupModal.style.display = 'none';
+                }
+            });
+    
+            loginForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const formData = new FormData(loginForm);
+                const response = await fetch(loginForm.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')  // Include CSRF token
+                    },
+                    body: formData
+                });
+    
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        window.location.href = '/';
+                    } else {
+                        loginError.textContent = data.error_message;
+                        signinModal.style.display = 'block';
+                    }
+                } else {
+                    loginError.textContent = 'An error occurred. Please try again.';
+                    signinModal.style.display = 'block';
+                }
+            });
+    
+            signupForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const formData = new FormData(signupForm);
+                const response = await fetch(signupForm.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')  // Include CSRF token
+                    },
+                    body: formData
+                });
+    
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        window.location.href = '/';
+                    } else {
+                        signupError.textContent = data.error_message;
+                        signupModal.style.display = 'block';
+                    }
+                } else {
+                    signupError.textContent = 'An error occurred. Please try again.';
+                    signupModal.style.display = 'block';
+                }
+            });
         });
-
-        if (response.ok) {
-            const data = await response.json();
-            if (data.success) {
-                // Redirect on successful login
-                window.location.href = '/';
-            } else {
-                // Display error message in the modal
-                loginError.textContent = data.error_message;
-                signinModal.style.display = 'block'; // Ensure modal stays open
-            }
-        } else {
-            loginError.textContent = 'An error occurred. Please try again.';
-            signinModal.style.display = 'block'; // Ensure modal stays open
-        }
-    });
-
-    // Handle signup form submission
-    signupForm.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Prevent default form submission
-
-        const formData = new FormData(signupForm);
-        const response = await fetch(signupForm.action, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest', // Indicate AJAX request
-            },
-            body: formData
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            if (data.success) {
-                // Redirect on successful signup
-                window.location.href = '/';
-            } else {
-                // Display error message in the modal
-                signupError.textContent = data.error_message;
-                signupModal.style.display = 'block'; // Ensure modal stays open
-            }
-        } else {
-            signupError.textContent = 'An error occurred. Please try again.';
-            signupModal.style.display = 'block'; // Ensure modal stays open
-        }
-    });
-});
     </script>
+    
 </body>
 
 </html>

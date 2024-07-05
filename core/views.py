@@ -161,13 +161,13 @@ def login_view(request):
         
         if user is not None:
             auth.login(request, user)
-            if request.is_ajax():
+            if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
                 return JsonResponse({'success': True})
             else:
                 return redirect('/')
         else:
             error_message = 'Invalid credentials'
-            if request.is_ajax():
+            if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
                 return JsonResponse({'success': False, 'error_message': error_message})
             else:
                 messages.info(request, error_message)
