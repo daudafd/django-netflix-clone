@@ -1,5 +1,5 @@
 import re
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
@@ -118,14 +118,14 @@ def signup_view(request):
         if password == password2:
             if User.objects.filter(email=email).exists():
                 error_message = 'Email Taken'
-                if request.is_ajax():
+                if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
                     return JsonResponse({'success': False, 'error_message': error_message})
                 else:
                     messages.info(request, error_message)
                     return redirect('login')
             elif User.objects.filter(username=username).exists():
                 error_message = 'Username Taken'
-                if request.is_ajax():
+                if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
                     return JsonResponse({'success': False, 'error_message': error_message})
                 else:
                     messages.info(request, error_message)
@@ -137,13 +137,13 @@ def signup_view(request):
                 # Log in user
                 user_login = auth.authenticate(username=username, password=password)
                 auth.login(request, user_login)
-                if request.is_ajax():
+                if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
                     return JsonResponse({'success': True})
                 else:
                     return redirect('/')
         else:
             error_message = 'Passwords Do Not Match'
-            if request.is_ajax():
+            if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
                 return JsonResponse({'success': False, 'error_message': error_message})
             else:
                 messages.info(request, error_message)
