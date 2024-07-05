@@ -1,0 +1,47 @@
+[33mcommit f5c6701ba6d8279a391359ff2302c947a834b8e2[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: daudafd <daudafd@gmail.com>
+Date:   Thu Jun 27 08:30:33 2024 +0100
+
+    return requirement to original
+
+[33mcommit 6e70f00763e6d8190ac7ba44f61aef41b5404996[m
+Author: daudafd <daudafd@gmail.com>
+Date:   Thu Jun 27 08:28:28 2024 +0100
+
+    added whitenoise
+
+[33mcommit 305467726fc8da336e7dd772751c4bb22e649182[m
+Author: daudafd <daudafd@gmail.com>
+Date:   Thu Jun 27 08:02:08 2024 +0100
+
+    adjusted Procfile
+
+[33mcommit bf4694b3cd1402e431c5d381eaa1a3b046587d3c[m
+Author: daudafd <daudafd@gmail.com>
+Date:   Thu Jun 27 07:27:30 2024 +0100
+
+    adjusted SECRET KEY
+
+[33mcommit 112cd125a036c06907f5f9e3ea5a73f9c86c8655[m
+Author: daudafd <daudafd@gmail.com>
+Date:   Thu Jun 27 06:57:56 2024 +0100
+
+    adjusted Debug and requirements
+
+[33mcommit 1732a405284488ad78c906dd2b17feadb7cb7a51[m
+Author: daudafd <daudafd@gmail.com>
+Date:   Thu Jun 27 06:03:58 2024 +0100
+
+    run collectstatic command
+
+[33mcommit ef99369c4c6db41a9b8b8b443926ba3122fcefd6[m
+Author: daudafd <daudafd@gmail.com>
+Date:   Thu Jun 27 05:58:14 2024 +0100
+
+    settings updated with CSRF
+
+[33mcommit 702f76af5191b20fd266d3084e50ae4ea382b947[m
+Author: daudafd <daudafd@gmail.com>
+Date:   Thu Jun 27 05:53:19 2024 +0100
+
+    first commit
