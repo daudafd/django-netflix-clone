@@ -13,6 +13,26 @@
 
     <!-- Adjust path if necessary -->
     <!-- Other meta tags, scripts, and stylesheets -->
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .btn {
+            position: relative;
+        }
+        .spinner-border {
+            margin-left: 8px;
+            width: 2rem;
+            height: 2rem;
+            border: 0.2em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            display: none;
+            animation: spinner-border 0.75s linear infinite;
+        }
+        @keyframes spinner-border {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 
 </head>
 
@@ -34,26 +54,18 @@
             <h1 class="banner__title">Unlimited movies, TV shows, and more.</h1>
             <h2 class="banner__subtitle">Watch anywhere. Cancel anytime.</h2>
 
-            <h4 class="form__cta">
-                Ready to watch? Enter your email to create or restart your membership.
-            </h4>
-
-            <form class="membership__form">
-                <div class="membership__input__container">
-                    <input class="membership__input" type="email" />
-                    <label class="membership__placeholder" for="email">Email</label>
-                </div>
-                <label class="membership__input__message"> </label>
-
+            <h3 class="form__cta">
+                Ready to watch? 
                 <button class="sign__up__btn primary--btn" type="submit">
                     Get started
                 </button>
-            </form>
+            </h3>
         </div>
     </section>
 
-<!-- SignIn Modal -->
-<div id="signinModal" class="signinmodal">
+
+ <!-- SignIn Modal -->
+ <div id="signinModal" class="signinmodal">
     <div class="signin-container">
         <h1>Login</h1>
         <div id="loginError">
@@ -65,7 +77,10 @@
             {% csrf_token %}
             <input type="text" name="input_username" placeholder="Username" />
             <input type="password" name="input_password" placeholder="Password" />
-            <button type="submit" class="signin-btn">Login</button>
+            <button type="submit" class="signin-btn">
+                <span class="button-text">Login</span>
+                <div class="spinner-border" role="status"></div>
+            </button>
         </form>
         <div class="help-text" align="center">
             <h2>Unlimited movies, TV shows, and more.</h2>
@@ -73,29 +88,31 @@
     </div>
 </div>
 
-    <div id="signupModal" class="signupmodal">
-        <div class="signup-container">
-            <h1>Sign Up</h1>
-            <div id="signupError">
-                {% for message in messages %}
-                <h1>{{message}}</h1>
-                {% endfor %}
-            </div>
-
-            <form id="signupForm" action="{% url 'signup' %}" method="POST">
-                {% csrf_token %}
-                <input type="email" name="input_email" placeholder="Email address" required />
-                <input type="text" name="input_username" placeholder="Username" required />
-                <input type="password" name="input_password" placeholder="Password" required />
-                <input type="password" name="input_password2" placeholder="Repeat Password" required />
-                <button type="submit" class="signup-btn">Get Started ></button>
-            </form>
-
-            <div class="help-text" align="center">
-                <h2>Unlimited movies, TV shows, and more.</h2>
-            </div>
+<!-- SignUp Modal -->
+<div id="signupModal" class="signupmodal">
+    <div class="signup-container">
+        <h1>Sign Up</h1>
+        <div id="signupError">
+            {% for message in messages %}
+            <h1>{{message}}</h1>
+            {% endfor %}
+        </div>
+        <form id="signupForm" action="{% url 'signup' %}" method="POST">
+            {% csrf_token %}
+            <input type="email" name="input_email" placeholder="Email address" required />
+            <input type="text" name="input_username" placeholder="Username" required />
+            <input type="password" name="input_password" placeholder="Password" required />
+            <input type="password" name="input_password2" placeholder="Repeat Password" required />
+            <button type="submit" class="signup-btn">
+                <span class="button-text">Get Started ></span>
+                <div class="spinner-border" role="status"></div>
+            </button>
+        </form>
+        <div class="help-text" align="center">
+            <h2>Unlimited movies, TV shows, and more.</h2>
         </div>
     </div>
+</div>
 
     <hr class="section__divider" />
 
@@ -246,6 +263,8 @@
             const signupForm = document.getElementById('signupForm');
             const loginError = document.getElementById('loginError');
             const signupError = document.getElementById('signupError');
+            const loginButton = loginForm.querySelector('.signin-btn');
+            const signupButton = signupForm.querySelector('.signup-btn');
     
             signInButton.addEventListener('click', (event) => {
                 event.preventDefault();
@@ -274,58 +293,53 @@
                     signupModal.style.display = 'none';
                 }
             });
-    
-            loginForm.addEventListener('submit', async (event) => {
+
+            const handleFormSubmit = async (form, button, errorElement, modal) => {
                 event.preventDefault();
-                const formData = new FormData(loginForm);
-                const response = await fetch(loginForm.action, {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')  // Include CSRF token
-                    },
-                    body: formData
-                });
+                const buttonText = button.querySelector('.button-text');
+                const spinner = button.querySelector('.spinner-border');
+                
+                buttonText.style.display = 'none';
+                spinner.style.display = 'inline-block';
+                button.disabled = true;
     
-                if (response.ok) {
+                const formData = new FormData(form);
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                        },
+                        body: formData
+                    });
+
                     const data = await response.json();
-                    if (data.success) {
-                        window.location.href = '/';
+
+                    if (response.ok) {
+                        if (data.success) {
+                            window.location.href = '/';
+                        } else {
+                            errorElement.textContent = data.error_message;
+                            modal.style.display = 'block';
+                        }
                     } else {
-                        loginError.textContent = data.error_message;
-                        signinModal.style.display = 'block';
+                        errorElement.textContent = 'An error occurred. Please try again.';
+                        modal.style.display = 'block';
                     }
-                } else {
-                    loginError.textContent = 'An error occurred. Please try again.';
-                    signinModal.style.display = 'block';
+                } catch (error) {
+                    console.error('Error:', error);
+                    errorElement.textContent = 'An error occurred. Please try again.';
+                    modal.style.display = 'block';
                 }
-            });
+
+                buttonText.style.display = 'inline-block';
+                spinner.style.display = 'none';
+                button.disabled = false;
+            };
     
-            signupForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                const formData = new FormData(signupForm);
-                const response = await fetch(signupForm.action, {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')  // Include CSRF token
-                    },
-                    body: formData
-                });
-    
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success) {
-                        window.location.href = '/';
-                    } else {
-                        signupError.textContent = data.error_message;
-                        signupModal.style.display = 'block';
-                    }
-                } else {
-                    signupError.textContent = 'An error occurred. Please try again.';
-                    signupModal.style.display = 'block';
-                }
-            });
+            loginForm.addEventListener('submit', (event) => handleFormSubmit(loginForm, loginButton, loginError, signinModal));
+            signupForm.addEventListener('submit', (event) => handleFormSubmit(signupForm, signupButton, signupError, signupModal));
         });
     </script>
     
